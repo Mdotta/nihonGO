@@ -20,7 +20,7 @@ func getHiraganaMap() map[string]string {
 		"こ": "ko",
 		"さ": "sa",
 		"し": "shi",
-		"す": "su",
+		"す": "tsu",
 		"せ": "se",
 		"そ": "so",
 		"た": "ta",
