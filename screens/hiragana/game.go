@@ -17,16 +17,6 @@ type Model struct {
 	current_alternatives []string
 	keymap               keymap
 	help                 help.Model
-	quitting             bool
-}
-
-func (m Model) helpView() string {
-	return "\n" + m.help.ShortHelpView([]key.Binding{
-		m.keymap.up,
-		m.keymap.down,
-		m.keymap.choose,
-		m.keymap.quit,
-	})
 }
 
 func mapKeys() keymap {
@@ -43,10 +33,6 @@ func mapKeys() keymap {
 			key.WithKeys(tea.KeySpace.String()),
 			key.WithHelp("Space", "choose"),
 		),
-		quit: key.NewBinding(
-			key.WithKeys("q", "ctrl+c"),
-			key.WithHelp("q", "quit"),
-		),
 	}
 }
 
@@ -54,7 +40,6 @@ type keymap struct {
 	up     key.Binding
 	down   key.Binding
 	choose key.Binding
-	quit   key.Binding
 }
 
 func (m Model) Init() tea.Cmd {
@@ -65,8 +50,6 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch {
-		case key.Matches(msg, m.keymap.quit):
-			return m, tea.Quit
 
 		case key.Matches(msg, m.keymap.up):
 			if m.cursor > 0 {

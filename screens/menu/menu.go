@@ -10,28 +10,6 @@ type keymap struct {
 	up     key.Binding
 	down   key.Binding
 	choose key.Binding
-	quit   key.Binding
-}
-
-func mapKeys() keymap {
-	return keymap{
-		up: key.NewBinding(
-			key.WithKeys(tea.KeyUp.String()),
-			key.WithHelp(tea.KeyUp.String(), "go up"),
-		),
-		down: key.NewBinding(
-			key.WithKeys(tea.KeyDown.String()),
-			key.WithHelp(tea.KeyDown.String(), "go down"),
-		),
-		choose: key.NewBinding(
-			key.WithKeys(tea.KeySpace.String()),
-			key.WithHelp("Space", "choose"),
-		),
-		quit: key.NewBinding(
-			key.WithKeys("q", "ctrl+c"),
-			key.WithHelp("q", "quit"),
-		),
-	}
 }
 
 type MenuModel struct {
@@ -39,17 +17,7 @@ type MenuModel struct {
 	keymap           keymap
 	help             help.Model
 	gamemodes        []string
-	selectedGamemode string
-	quitting         bool
-}
-
-func (m MenuModel) helpView() string {
-	return "\n" + m.help.ShortHelpView([]key.Binding{
-		m.keymap.up,
-		m.keymap.down,
-		m.keymap.choose,
-		m.keymap.quit,
-	})
+	SelectedGamemode string
 }
 
 func (m MenuModel) Init() tea.Cmd {
@@ -60,11 +28,9 @@ func (m MenuModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch {
-		case key.Matches(msg, m.keymap.quit):
-			m.quitting = true
 
 		case key.Matches(msg, m.keymap.choose):
-			m.selectedGamemode = m.gamemodes[m.cursor]
+			m.SelectedGamemode = m.gamemodes[m.cursor]
 
 		case key.Matches(msg, m.keymap.up):
 			if m.cursor > 0 {
@@ -82,8 +48,7 @@ func (m MenuModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m MenuModel) View() string {
-	s := "NihonGo"
-	s += "\nGamemode selection:"
+	s := "Gamemode selection:"
 	for i, mode := range m.gamemodes {
 		cursor := " "
 		if m.cursor == i {
@@ -104,7 +69,6 @@ func NewModel(availableGamemodes []string) MenuModel {
 		keymap:    mapKeys(),
 		help:      help.New(),
 	}
-	keymap := mapKeys()
 	model.keymap = model.keymap
 
 	return model

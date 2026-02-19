@@ -1,6 +1,10 @@
 package hiragana
 
-import "math/rand/v2"
+import (
+	"math/rand/v2"
+
+	"github.com/charmbracelet/bubbles/key"
+)
 
 func getHiraganaMap() map[string]string {
 	return map[string]string{
@@ -55,4 +59,20 @@ func getNewKana(pool map[string]string) (string, []string) {
 
 	rand.Shuffle(len(alts), func(i, j int) { alts[i], alts[j] = alts[j], alts[i] })
 	return kana, alts
+}
+
+func (m Model) helpView() string {
+	return "\n" + m.help.ShortHelpView([]key.Binding{
+		m.keymap.up,
+		m.keymap.down,
+		m.keymap.choose,
+	})
+}
+
+func (m Model) KeyList() []key.Binding {
+	return []key.Binding{
+		m.keymap.up,
+		m.keymap.down,
+		m.keymap.choose,
+	}
 }
