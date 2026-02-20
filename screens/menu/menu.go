@@ -69,7 +69,6 @@ func NewModel(availableGamemodes []string) MenuModel {
 		keymap:    mapKeys(),
 		help:      help.New(),
 	}
-	model.keymap = model.keymap
 
 	return model
 }
