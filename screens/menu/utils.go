@@ -37,3 +37,7 @@ func (m MenuModel) KeyList() []key.Binding {
 		m.keymap.choose,
 	}
 }
+
+func (m *MenuModel) ClearGameMode() {
+	m.SelectedGamemode = ""
+}

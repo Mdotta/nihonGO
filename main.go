@@ -18,6 +18,17 @@ const (
 	gameScreen
 )
 
+func (s screen) String() string {
+	switch s {
+	case menuScreen:
+		return "Menu"
+	case gameScreen:
+		return "Game"
+	default:
+		return "Unknown"
+	}
+}
+
 var gamemodes = []string{
 	"Hiragana",
 	"Katakana",
@@ -42,6 +53,7 @@ func (m appModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		switch {
 		case key.Matches(msg, quitKeys):
 			if m.currentScreen == gameScreen {
+				m.menuModel.ClearGameMode()
 				m.currentScreen = menuScreen
 				m.gameModel = nil
 				return m, nil
@@ -75,6 +87,8 @@ func (m appModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 func (m appModel) View() string {
 	view := "NihonGo\n"
+	view += "========\n\n"
+	view += "Current screen: " + m.currentScreen.String() + "\n\n"
 	switch m.currentScreen {
 	case menuScreen:
 		view += m.menuModel.View()
