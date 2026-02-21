@@ -1,6 +1,7 @@
-package hiragana
+package game
 
 import (
+	"hiragana-guesser/modelStack"
 	"strconv"
 
 	"github.com/charmbracelet/bubbles/help"
@@ -8,7 +9,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 )
 
-type Model struct {
+type flashcardGameModel struct {
 	// timer    timer.Model
 	score                int
 	cursor               int
@@ -19,34 +20,11 @@ type Model struct {
 	help                 help.Model
 }
 
-func mapKeys() keymap {
-	return keymap{
-		up: key.NewBinding(
-			key.WithKeys(tea.KeyUp.String()),
-			key.WithHelp(tea.KeyUp.String(), "go up"),
-		),
-		down: key.NewBinding(
-			key.WithKeys(tea.KeyDown.String()),
-			key.WithHelp(tea.KeyDown.String(), "go down"),
-		),
-		choose: key.NewBinding(
-			key.WithKeys(tea.KeySpace.String()),
-			key.WithHelp("Space", "choose"),
-		),
-	}
-}
-
-type keymap struct {
-	up     key.Binding
-	down   key.Binding
-	choose key.Binding
-}
-
-func (m Model) Init() tea.Cmd {
+func (m flashcardGameModel) Init() tea.Cmd {
 	return nil
 }
 
-func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m flashcardGameModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch {
@@ -67,6 +45,8 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 			m.cursor = 0
 			m.current_kana, m.current_alternatives = getNewKana(m.pool)
+		case key.Matches(msg, m.keymap.previous):
+			return m, modelStack.Pop()
 		}
 
 	}
@@ -74,7 +54,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, nil
 }
 
-func (m Model) View() string {
+func (m flashcardGameModel) View() string {
 	s := "score: " + strconv.Itoa(m.score)
 	s += "\n" + m.current_kana
 	for i, alt := range m.current_alternatives {
@@ -90,12 +70,17 @@ func (m Model) View() string {
 	return s
 }
 
-func NewModel() Model {
-	model := Model{
-		pool:   getHiraganaMap(),
+func NewModel(pool map[string]string, options ...Option) flashcardGameModel {
+	model := flashcardGameModel{
+		pool:   pool,
 		keymap: mapKeys(),
 		help:   help.New(),
 	}
+
+	for _, option := range options {
+		option(&model)
+	}
+
 	model.current_kana, model.current_alternatives = getNewKana(model.pool)
 
 	return model

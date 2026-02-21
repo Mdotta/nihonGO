@@ -20,7 +20,7 @@ type PopModel struct {
 	Msgs []tea.Msg
 }
 
-func new(initialModel tea.Model) ModelStack {
+func New(initialModel tea.Model) ModelStack {
 	return ModelStack{
 		current: initialModel,
 		stack:   stack.Stack[tea.Model]{},
@@ -56,7 +56,6 @@ func (ms ModelStack) Init() tea.Cmd {
 }
 
 func (ms ModelStack) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
-
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
 		ms.lastResize = msg
@@ -67,6 +66,9 @@ func (ms ModelStack) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		cmd2 := ms.updateCurrent(ms.lastResize)
 		return ms, tea.Batch(cmd, cmd2)
 	case PopModel:
+		if ms.stack.Peek() == nil {
+			return ms, nil
+		}
 		ms.current = ms.stack.Pop().Value
 		cmds := make(tea.BatchMsg, 2+len(msg.Msgs))
 		cmds[0] = ms.current.Init()

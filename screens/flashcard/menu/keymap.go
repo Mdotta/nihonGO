@@ -5,6 +5,14 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 )
 
+type keymap struct {
+	up       key.Binding
+	down     key.Binding
+	choose   key.Binding
+	options  key.Binding
+	previous key.Binding
+}
+
 func mapKeys() keymap {
 	return keymap{
 		up: key.NewBinding(
@@ -19,15 +27,15 @@ func mapKeys() keymap {
 			key.WithKeys(tea.KeySpace.String()),
 			key.WithHelp("Space", "choose"),
 		),
+		options: key.NewBinding(
+			key.WithKeys("o"),
+			key.WithHelp("o", "toggle options"),
+		),
+		previous: key.NewBinding(
+			key.WithKeys(tea.KeyBackspace.String()),
+			key.WithHelp("Backspace", "go back"),
+		),
 	}
-}
-
-func (m MenuModel) helpView() string {
-	return "\n" + m.help.ShortHelpView([]key.Binding{
-		m.keymap.up,
-		m.keymap.down,
-		m.keymap.choose,
-	})
 }
 
 func (m MenuModel) KeyList() []key.Binding {
@@ -35,9 +43,7 @@ func (m MenuModel) KeyList() []key.Binding {
 		m.keymap.up,
 		m.keymap.down,
 		m.keymap.choose,
+		m.keymap.options,
+		m.keymap.previous,
 	}
-}
-
-func (m *MenuModel) ClearGameMode() {
-	m.SelectedGamemode = ""
 }
